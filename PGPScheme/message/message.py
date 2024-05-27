@@ -1,13 +1,10 @@
 from Cryptodome.Signature import pkcs1_15
 from cryptography.hazmat.primitives import serialization
 
-from PGPScheme.message.configuration import private_key_ring_collection
-from Cryptodome.Cipher import CAST
+from PGPScheme.security.configuration import *
 from Cryptodome.Hash import SHA1
 from Cryptodome.PublicKey import RSA
 import time
-from Cryptodome.Random import get_random_bytes
-from cryptography.hazmat.primitives.asymmetric import rsa
 
 
 class Message:
@@ -32,6 +29,7 @@ class Message:
         private_key = key_pair.decrypt_private_key(passphrase)
 
         self.__signature_time = time.time()
+
         private_pem = private_key.private_bytes(
             encoding=serialization.Encoding.PEM,
             format=serialization.PrivateFormat.PKCS8,
@@ -46,8 +44,12 @@ class Message:
         self.__message += str(self.__message_digest) + str(self.__leading_two_octets) + str(self.__sender_key_id) \
             + str(self.__signature_time)
 
-    def security(self):
-        pass
+    def security(self, algorithm):
+        message_block = get_message_block()
+        session_key = key_generator.generate_session_key(message_block)
+
+        #pozvati enkripciju odgovarajucim algoritmom aes ili 3des
+        #dohvatiti javni kljuc iz prstena javnih kljuceva za enkripciju kljuca sesije i konkatenirati na poruku
 
     def compression(self):
         pass

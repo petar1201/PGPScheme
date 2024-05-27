@@ -1,4 +1,4 @@
-from PGPScheme.message.configuration import private_key_ring_collection
+from PGPScheme.security.configuration import private_key_ring_collection
 
 
 private_key_ring_collection.add_key_pair("mina", "minavu@gmail.com", "mina123", 2048)
