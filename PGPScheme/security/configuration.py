@@ -1,4 +1,4 @@
-from PGPScheme.security.keys import PrivateKeyRingCollection
+from PGPScheme.security.private_keys import PrivateKeyRingCollection
 from PGPScheme.security.session_key import *
 
 private_key_ring_collection = PrivateKeyRingCollection()

@@ -6,35 +6,45 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.backends import default_backend
 import base64
+from datetime import datetime
+
 
 
 class PrivateKeyPair:
-    __timestamp = None
-    __user_id = None
-    __public_key = None
-    __key_id = None
-    __encrypted_private_key = None
 
-    def __init__(self, name, email, passphrase, key_size):
-        self.__timestamp = time.time()
-        self.__user_id = email + "|" + name
-        private_key = rsa.generate_private_key(
-            public_exponent=65537,
-            key_size=key_size,
-            backend=default_backend()
-        )
-        self.__public_key = private_key.public_key()
-        self.__key_id = self.__calc_key_id()
-        self.__encrypted_private_key = self.encrypt_private_key(passphrase, private_key)
+    def __init__(self, name, email, passphrase, key_size, import_key = ""):
+        if import_key == "":
+            self.__timestamp = time.time()
+            self.__user_id = email + "|" + name
+            private_key = rsa.generate_private_key(
+                public_exponent=65537,
+                key_size=key_size,
+                backend=default_backend()
+            )
+            self.__public_key = private_key.public_key()
+            self.__key_id = self.__calc_key_id()
+            self.__encrypted_private_key = self.encrypt_private_key(passphrase, private_key)
+        else:
+            timestamp, user_id, name, public_key, encr_priv_key, key_id = import_key.split("|")
+            self.__timestamp = datetime.fromtimestamp(float(timestamp)).timestamp()
+            self.__user_id = user_id + "|" + name
+            self.__encrypted_private_key = encr_priv_key
+            self.__public_key = serialization.load_pem_public_key(
+                public_key.encode(),
+                backend=default_backend()
+            )
+            self.__key_id = self.__calc_key_id()
 
-        # writeInFile
-        self.__str__()
+
 
     def __delete__(self, instance):
         return
 
     def __str__(self) -> str:
-        return self.__timestamp.__str__() + "|" + self.__user_id + "|" + self.__public_key.__str__() \
+        return self.__timestamp.__str__() + "|" + self.__user_id + "|" + self.__public_key.public_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PublicFormat.PKCS1,
+        ).decode() \
             + "|" + self.__encrypted_private_key.__str__() + "|" + self.__key_id.__str__()
 
     def __calc_key_id(self):
@@ -115,5 +125,33 @@ class PrivateKeyRingCollection:
     def delete_key_pair_by_user_id(self, user_id):
         if user_id in self.key_rings:
             del self.key_rings[user_id]
+
+
+    def export_key_ring_to_pem(self, pem_file_path):
+        if not self.key_rings:
+            raise ValueError("Key ring is empty, nothing to export.")
+
+        with open(pem_file_path, "wb") as pem_file:
+            for user_id, key_pair in self.key_rings.items():
+                try:
+                    pem_file.write(
+                        f"---BEGIN---{user_id};{key_pair.__str__()}---END---\n".encode("utf-8")
+                    )
+                except Exception as e:
+                    print(f"Failed to export key for user_id {user_id}: {e}")
+
+    def import_key_ring_from_pem(self, pem_file_path):
+        with open(pem_file_path, "rb") as pem_file:
+            pem_data = pem_file.read()
+
+        pem_blocks = pem_data.split(b"---END---\n")
+        for pem_block in pem_blocks:
+            try:
+                user_id, str_key_pair = pem_block[11:-9].split(b";")
+                self.key_rings[user_id.decode()] = PrivateKeyPair("","", "",2048, str_key_pair.decode("utf-8"))
+            except Exception:
+                print()
+
+
 
 
