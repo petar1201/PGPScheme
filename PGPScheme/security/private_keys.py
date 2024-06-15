@@ -12,6 +12,7 @@ from datetime import datetime
 
 class PrivateKeyPair:
 
+
     def __init__(self, name, email, passphrase, key_size, import_key = ""):
         if import_key == "":
             self.__timestamp = time.time()
@@ -157,4 +158,8 @@ class PrivateKeyRingCollection:
                 self.key_rings_user_id[user_id.decode()] = PrivateKeyPair("","", "",2048, str_key_pair.decode("utf-8"))
             except Exception:
                 print()
+
+
+
+
 
