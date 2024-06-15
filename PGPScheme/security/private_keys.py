@@ -124,6 +124,13 @@ class PrivateKeyRingCollection:
 
         return key_pair
 
+    def delete_key_pair(self, name, email):
+        if self.key_rings_key_id.keys().__contains__(email + "|" + name):
+            del self.key_rings_user_id[email + "|" + name]
+            del self.key_rings_key_id[self.key_rings_user_id[email + "|" + name].get_key_id()]
+            return
+        raise KeyError
+
     def get_key_pair_by_user_id(self, user_id) -> PrivateKeyPair:
         return self.key_rings_user_id.get(user_id)
 
@@ -167,7 +174,22 @@ class PrivateKeyRingCollection:
                     backend=default_backend()
                 ))
                 self.key_rings_key_id[key_id] = PrivateKeyPair("","", "",2048, str_key_pair.decode("utf-8"))
-
             except Exception as e:
                 if len(pem_block)>1:
                     print(e)
+
+    def get_ring_data(self):
+        data = []
+
+        for p, q in self.key_rings_user_id.items():
+            val2 = f"{q._PrivateKeyPair__key_id[0:2]}0{q._PrivateKeyPair__key_id[2:].upper()}"
+            val1 = f"{q._PrivateKeyPair__key_id[0:2]}{q._PrivateKeyPair__key_id[2:].upper()}"
+
+            line = {
+                "user_id": f"{p}",
+                "timestamp": f"{datetime.fromtimestamp(q._PrivateKeyPair__timestamp)}",
+                "key_id": f"{val1 if len(q._PrivateKeyPair__key_id) == 18 else val2.upper()}",
+                "public_key": f"public_key{q._PrivateKeyPair__public_key.public_bytes(encoding=serialization.Encoding.PEM, format=serialization.PublicFormat.PKCS1, ).decode()}",
+                "encrypted_private_key": f"{q._PrivateKeyPair__encrypted_private_key}"}
+            data.append(line)
+        return data
