@@ -1,5 +1,8 @@
 import tkinter as tk
+from tkinter import simpledialog
+
 from PGPScheme.security.configuration import *
+from PGPScheme.message.message import *
 
 
 class PGPApp:
@@ -9,9 +12,8 @@ class PGPApp:
 
         self.root.title("PGP Scheme")
         self.root.geometry("950x600")
-        self.root.configure(bg="#2c3e50")  # Set the background color
+        self.root.configure(bg="#2c3e50")
 
-        # Define button click functions
         self.button_functions = [
             self.generate_keys_button_click,
             self.delete_keys_button_click,
@@ -133,7 +135,7 @@ class PGPApp:
         private_button.grid(row=0, column=3, padx=30, pady=10)
         public_button.grid(row=1, column=3, padx=30, pady=10)
 
-        status_label.pack(side = tk.BOTTOM)
+        status_label.pack(side=tk.BOTTOM)
 
         form_frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
@@ -167,7 +169,7 @@ class PGPApp:
         private_button.grid(row=0, column=3, padx=30, pady=10)
         public_button.grid(row=1, column=3, padx=30, pady=10)
 
-        status_label.pack(side = tk.BOTTOM)
+        status_label.pack(side=tk.BOTTOM)
 
         form_frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
@@ -190,7 +192,6 @@ class PGPApp:
 
     def show_private_key_ring(self):
 
-
         private_key_data = private_key_ring_collection.get_ring_data()
 
         self.clear_window()
@@ -211,7 +212,8 @@ class PGPApp:
 
         headers = ["User ID", "Timestamp", "Key ID", "Public Key", "Encrypted Private Key"]
         for col, header in enumerate(headers):
-            label = tk.Label(scrollable_frame, text=header, bg="#2c3e50", fg="white", font=("Helvetica", 12, "bold"), padx=10, pady=5)
+            label = tk.Label(scrollable_frame, text=header, bg="#2c3e50", fg="white", font=("Helvetica", 12, "bold"),
+                             padx=10, pady=5)
             label.grid(row=0, column=col, sticky="nsew")
 
         flag = 1
@@ -220,21 +222,28 @@ class PGPApp:
             if flag == 1:
                 pady = 20
                 flag = 0
-            tk.Label(scrollable_frame, text=key["user_id"], bg="#2c3e50", fg="white", font=("Helvetica", 12), padx=10, pady=pady).grid(row=row, column=0, sticky="nsew")
-            tk.Label(scrollable_frame, text=key["timestamp"], bg="#2c3e50", fg="white", font=("Helvetica", 12), padx=10, pady=5).grid(row=row, column=1, sticky="nsew")
-            tk.Label(scrollable_frame, text=key["key_id"], bg="#2c3e50", fg="white", font=("Helvetica", 12), padx=10, pady=5).grid(row=row, column=2, sticky="nsew")
-            public_key_button = tk.Button(scrollable_frame, text="Show", command=lambda pk=key["public_key"]: self.show_popup("Public Key", pk), bg="#3498db", fg="white", font=("Helvetica", 12))
+            tk.Label(scrollable_frame, text=key["user_id"], bg="#2c3e50", fg="white", font=("Helvetica", 12), padx=10,
+                     pady=pady).grid(row=row, column=0, sticky="nsew")
+            tk.Label(scrollable_frame, text=key["timestamp"], bg="#2c3e50", fg="white", font=("Helvetica", 12), padx=10,
+                     pady=5).grid(row=row, column=1, sticky="nsew")
+            tk.Label(scrollable_frame, text=key["key_id"], bg="#2c3e50", fg="white", font=("Helvetica", 12), padx=10,
+                     pady=5).grid(row=row, column=2, sticky="nsew")
+            public_key_button = tk.Button(scrollable_frame, text="Show",
+                                          command=lambda pk=key["public_key"]: self.show_popup("Public Key", pk),
+                                          bg="#3498db", fg="white", font=("Helvetica", 12))
             public_key_button.grid(row=row, column=3, padx=10, pady=5)
-            encrypted_private_key_button = tk.Button(scrollable_frame, text="Show", command=lambda epk=key["encrypted_private_key"]: self.show_popup("Encrypted Private Key", epk), bg="#3498db", fg="white", font=("Helvetica", 12))
+            encrypted_private_key_button = tk.Button(scrollable_frame, text="Show",
+                                                     command=lambda epk=key["encrypted_private_key"]: self.show_popup(
+                                                         "Encrypted Private Key", epk), bg="#3498db", fg="white",
+                                                     font=("Helvetica", 12))
             encrypted_private_key_button.grid(row=row, column=4, padx=10, pady=5)
 
         self.create_back_button()
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
 
-    #TODO TAKE DATA FROM PUBLIC RING
     def show_public_key_ring(self):
-        public_data = private_key_ring_collection.get_ring_data()
+        public_data = public_key_ring_collection.get_ring_data()
 
         self.clear_window()
 
@@ -288,7 +297,6 @@ class PGPApp:
         data_label = tk.Label(form_frame, text="Message:", bg="#2c3e50", fg="white", font=("Helvetica", 14))
         data_entry = tk.Entry(form_frame, font=("Helvetica", 14))
 
-
         alg_3des_var = tk.BooleanVar(value=False)
         alg_3des = tk.Checkbutton(form_frame, text="3DES", variable=alg_3des_var, bg="#2c3e50",
                                   fg="white", font=("Helvetica", 14), selectcolor="#2c3e50", borderwidth=0,
@@ -319,11 +327,13 @@ class PGPApp:
                                fg="white", font=("Helvetica", 14), selectcolor="#2c3e50", borderwidth=0,
                                highlightthickness=0)
 
+        status_label = tk.Label(self.root, text="", bg="#2c3e50", fg="white", font=("Helvetica", 14))
+
         send_button = tk.Button(form_frame, text="Send",
                                 command=lambda: self.send_message(file_name_entry.get(), data_entry.get(),
                                                                   alg_3des_var.get(), alg_aes_var.get(),
                                                                   security_var.get(), authentication_var.get(),
-                                                                  zip_var.get(), radix_var.get()),
+                                                                  zip_var.get(), radix_var.get(), status_label),
                                 bg="#3498db", fg="white",
                                 font=("Helvetica", 14))
 
@@ -337,12 +347,20 @@ class PGPApp:
         security.grid(row=4, column=1, padx=5, pady=5, sticky="w")
         zip.grid(row=5, column=1, padx=5, pady=5, sticky="w")
         radix.grid(row=6, column=1, padx=5, pady=5, sticky="w")
-        send_button.grid(row=7, column=0, columnspan=2,  padx=5, pady=10)
+        send_button.grid(row=7, column=0, columnspan=2, padx=5, pady=10)
+
+        status_label.pack(side=tk.BOTTOM)
 
         form_frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
-    #TODO CALL SENDING MESSAGE
-    def send_message(self, filename, message, alg_3des, alg_aes, security, authentication, compress, radix):
+    def get_value(self, prompt):
+        self.root.deiconify()
+        value = simpledialog.askstring("Input", prompt, parent=self.root)
+        self.root.withdraw()
+        return value
+
+    def send_message(self, filename, message, alg_3des, alg_aes, security, authentication, compress, radix,
+                     status_label):
         alg = []
         if alg_3des:
             alg.append("3DES")
@@ -352,15 +370,30 @@ class PGPApp:
 
         filepath = f"../resources/inbox/{filename}.pem"
 
-        # Send the message with the collected form data
-        # Example: print the collected data
-        print(f"Filename: {filename}")
-        print(f"Message: {message}")
-        print(f"Algorithm: {alg_value}")
-        print(f"Security: {security}")
-        print(f"Authentication: {authentication}")
-        print(f"Compress: {compress}")
-        print(f"Radix: {radix}")
+        header = Header(
+            1 if authentication else 0,
+            1 if security else 0,
+            1 if compress else 0,
+            1 if radix else 0,
+            alg_value.lower() if alg_value else "3des"
+        )
+        auth_data = None
+        sec_data = None
+        if authentication:
+            user_id_sender = self.get_value("Enter sender user id")
+            passphrase = self.get_value("Enter passphrase")
+            auth_data = AuthenticationData(passphrase, user_id_sender)
+        if security:
+            user_id_receiver = self.get_value("Enter receiver user id")
+            sec_data = SecurityData(user_id_receiver)
+        mess = Message()
+        self.root.deiconify()
+        try:
+            mess.send(message, filepath, header, auth_data, sec_data)
+            status_label.config(text="Message Sent")
+        except Exception as e:
+            status_label.config(text="Failed to send message")
+            print(e)
 
     def show_receive_message_form(self):
         form_frame = tk.Frame(self.root, bg="#2c3e50")
@@ -368,21 +401,35 @@ class PGPApp:
         file_name_label = tk.Label(form_frame, text="Filename:", bg="#2c3e50", fg="white", font=("Helvetica", 14))
         file_name_entry = tk.Entry(form_frame, font=("Helvetica", 14))
 
-        send_button = tk.Button(form_frame, text="Send",
-                                command=lambda: self.receive_message(file_name_entry.get()),
+        status_label = tk.Label(self.root, text="", bg="#2c3e50", fg="white", font=("Helvetica", 14))
+
+        send_button = tk.Button(form_frame, text="Receive",
+                                command=lambda: self.receive_message(file_name_entry.get(), status_label),
                                 bg="#3498db", fg="white",
                                 font=("Helvetica", 14))
+
+        status_label.pack(side=tk.BOTTOM)
+
         file_name_label.grid(row=0, column=0, padx=5, pady=5, sticky="e")
         file_name_entry.grid(row=0, column=1, padx=5, pady=5)
-        send_button.grid(row=0, column=2,  padx=5, pady=10)
-
+        send_button.grid(row=0, column=2, padx=5, pady=10)
         form_frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
-    #TODO CALL RECEIVING MESSAGE
-    def receive_message(self, filename):
+    def receive_message(self, filename, status_label):
         filepath = f"../resources/inbox/{filename}.pem"
-        print(f"Filename: {filename}")
-        print(f"Path>: {filepath}")
+        mess = Message()
+        try:
+            flag, id = mess.receive(filepath)
+            passphrase = None
+            if flag:
+                passphrase = self.get_value(
+                    f"Enter passphrase for {private_key_ring_collection.get_key_pair_by_key_id(id).get_user_id()}")
+                self.root.deiconify()
+            self.show_popup("Received Message", mess.read(passphrase))
+            status_label.config(text="Message received")
+        except Exception as e:
+            status_label.config(text="Failed to receive message")
+            print(e)
 
     def show_popup(self, title, content):
         popup = tk.Toplevel()
@@ -392,7 +439,7 @@ class PGPApp:
 
         text_box = tk.Text(popup, wrap='word', bg="#2c3e50", fg="white", font=("Helvetica", 12))
         text_box.insert('1.0', content)
-        text_box.config(state="disabled")  # Make the text box read-only
+        text_box.config(state="disabled")
         text_box.pack(expand=True, fill='both', padx=10, pady=10)
 
     def private_key_ring_button_click(self):
@@ -412,11 +459,9 @@ class PGPApp:
         except Exception:
             status_label.config(text="Import Private Keys Failed")
 
-    #TODO IMPLEMENT FROM PUBLIC
     def import_public_keys(self, path, status_label):
         try:
-            #TODO FROM PUBLIC KEY RING
-            private_key_ring_collection.import_key_ring_from_pem(
+            public_key_ring_collection.import_key_ring_from_pem(
                 path if path else "../resources/keys/public_key.pem"
             )
             status_label.config(text="Import Public Keys Successfully")
@@ -432,11 +477,9 @@ class PGPApp:
         except Exception:
             status_label.config(text="Export Private Keys Failed")
 
-    #TODO IMPLEMENT FROM PUBLIC
     def export_public_keys(self, path, status_label):
         try:
-            #TODO FROM PUBLIC KEY RING
-            private_key_ring_collection.export_key_ring_to_pem(
+            public_key_ring_collection.export_key_ring_to_pem(
                 path if path else "../resources/keys/public_key.pem"
             )
             status_label.config(text="Export Public Keys Successfully")
@@ -447,6 +490,9 @@ class PGPApp:
         self.clear_window()
         try:
             private_key_ring_collection.add_key_pair(name, email, password, size)
+            public_key_ring_collection.add_key_pair(f"{email}|{name}",
+                                                    private_key_ring_collection.get_key_pair_by_user_id(
+                                                        f"{email}|{name}").get_public_key())
             textt = "Generated key for\n" + name + " " + email + " " + str(size) + " " + password
         except Exception:
             textt = "Key Generation Failed for for\n" + name + " " + email + " " + str(size) + " " + password
@@ -458,6 +504,7 @@ class PGPApp:
         self.clear_window()
         try:
             private_key_ring_collection.delete_key_pair(name, email)
+            public_key_ring_collection.delete_key_pair_by_user_id(f"{email}|{name}")
             textt = "Deleted key for\n" + name + " " + email
         except KeyError:
             textt = "No key for \n" + name + " " + email
@@ -540,11 +587,6 @@ class PGPApp:
                 widget.destroy()
 
 
-# Create the main window
 root = tk.Tk()
-
-# Instantiate the PGPApp class
 app = PGPApp(root)
-
-# Start the Tkinter event loop
 root.mainloop()
