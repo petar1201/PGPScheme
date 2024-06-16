@@ -261,7 +261,7 @@ class Message:
             self.__file_name = match.group(1).decode()
             self.__creation_time = match.group(2)
             self.__data = match.group(3).decode()
-            print(self.__data)
+            print(self.__data.strip())
         else:
             raise ValueError(f"Can't find Message")
 

@@ -49,6 +49,8 @@ class PrivateKeyPair:
         key_id = public_numbers.n & ((1 << 64) - 1)
         return hex(key_id)
 
+
+
     def get_key_id(self):
         return self.__key_id
 
@@ -119,6 +121,7 @@ class PrivateKeyRingCollection:
         key_pair = PrivateKeyPair(name, email, passphrase, key_size)
         self.key_rings_user_id[key_pair.get_user_id()] = key_pair
         self.key_rings_key_id[key_pair.get_key_id()] = key_pair
+
         return key_pair
 
     def get_key_pair_by_user_id(self, user_id) -> PrivateKeyPair:
@@ -130,6 +133,11 @@ class PrivateKeyRingCollection:
     def delete_key_pair_by_user_id(self, user_id):
         if user_id in self.key_rings_user_id:
             del self.key_rings_user_id[user_id]
+
+    def __calc_key_id(self, pub_key):
+        public_numbers = pub_key.public_numbers()
+        key_id = public_numbers.n & ((1 << 64) - 1)
+        return hex(key_id)
 
     def export_key_ring_to_pem(self, pem_file_path):
         if not self.key_rings_user_id:
@@ -153,5 +161,13 @@ class PrivateKeyRingCollection:
             try:
                 user_id, str_key_pair = pem_block[11:-9].split(b";")
                 self.key_rings_user_id[user_id.decode()] = PrivateKeyPair("","", "",2048, str_key_pair.decode("utf-8"))
-            except Exception:
-                print()
+
+                key_id = self.__calc_key_id(serialization.load_pem_public_key(
+                    str_key_pair.decode("utf-8").split("|")[3].encode(),
+                    backend=default_backend()
+                ))
+                self.key_rings_key_id[key_id] = PrivateKeyPair("","", "",2048, str_key_pair.decode("utf-8"))
+
+            except Exception as e:
+                if len(pem_block)>1:
+                    print(e)
