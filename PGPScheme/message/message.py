@@ -9,6 +9,7 @@ from Cryptodome.Signature import pkcs1_15
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.ciphers.algorithms import AES
 
+from PGPScheme.algorithms.aes import Aes
 from PGPScheme.algorithms.algorithm import Algorithm
 from PGPScheme.algorithms.triple_des import TripleDes
 from PGPScheme.security.configuration import *
@@ -91,8 +92,8 @@ class Message:
             algorithm = object
             if self.__header.algorithm == "3des":
                 algorithm = TripleDes()
-            #else:
-                #algorithm = AES()
+            else:
+                algorithm = Aes()
             self.security(security_data.user_id, algorithm)
         if self.__header.radix:
             self.radix()
@@ -186,6 +187,8 @@ class Message:
         algorithm = None
         if self.__header.algorithm == "3des":
             algorithm = TripleDes()
+        else:
+            algorithm = Aes()
         self.__message = algorithm.decrypt(self.__session_key, self.__message)
 
     def read_compressed(self):

@@ -9,11 +9,9 @@ import base64
 from datetime import datetime
 
 
-
 class PrivateKeyPair:
 
-
-    def __init__(self, name, email, passphrase, key_size, import_key = ""):
+    def __init__(self, name, email, passphrase, key_size, import_key=""):
         if import_key == "":
             self.__timestamp = time.time()
             self.__user_id = email + "|" + name
@@ -80,7 +78,6 @@ class PrivateKeyPair:
             format=serialization.PrivateFormat.PKCS8,
             encryption_algorithm=serialization.NoEncryption()
         )
-
 
         iv = get_random_bytes(CAST.block_size)
         cipher = CAST.new(cast_key, CAST.MODE_CFB, iv)
@@ -158,8 +155,3 @@ class PrivateKeyRingCollection:
                 self.key_rings_user_id[user_id.decode()] = PrivateKeyPair("","", "",2048, str_key_pair.decode("utf-8"))
             except Exception:
                 print()
-
-
-
-
-
