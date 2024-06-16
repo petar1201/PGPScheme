@@ -226,6 +226,8 @@ class Message:
 
         hash = SHA1.new(self.__message + self.__signature_time)
 
+        if hash.hexdigest()[:2].encode() != self.__leading_two_octets:
+            raise Exception(f"Message is not valid")
         try:
             pkcs1_15.new(public_key).verify(hash, self.__message_digest)
         except (ValueError, TypeError):
