@@ -24,8 +24,7 @@ class PublicKeyPair:
             encoding=serialization.Encoding.PEM,
             format=serialization.PublicFormat.PKCS1,
         ).decode() \
-             + "|" + self.__key_id.__str__()
-
+            + "|" + self.__key_id.__str__()
 
     def __calc_key_id(self):
         public_numbers = self.__public_key.public_numbers()
@@ -63,8 +62,6 @@ class PublicKeyRingCollection:
         if user_id in self.key_rings_user_id:
             del self.key_rings_key_id[self.key_rings_user_id[user_id].get_key_id()]
             del self.key_rings_user_id[user_id]
-
-
 
     def get_ring_data(self):
         data = []
@@ -111,5 +108,5 @@ class PublicKeyRingCollection:
                 self.key_rings_user_id[user_id.decode()] = public_key_pair
                 self.key_rings_key_id[public_key_pair.get_key_id()] = public_key_pair
             except Exception as e:
-                if len(pem_block)>1:
+                if len(pem_block) > 1:
                     print(e)

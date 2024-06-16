@@ -49,8 +49,6 @@ class PrivateKeyPair:
         key_id = public_numbers.n & ((1 << 64) - 1)
         return hex(key_id)
 
-
-
     def get_key_id(self):
         return self.__key_id
 
@@ -62,19 +60,15 @@ class PrivateKeyPair:
 
     @staticmethod
     def __get_cast_key_from_passphrase(passphrase):
-        # Create a 160-bit hash of the passphrase using SHA-1
         passphrase_bytes = passphrase.encode()
         hash_obj = SHA1.new(passphrase_bytes)
         hash_bytes = hash_obj.digest()
-        # Use the first 128 bits (16 bytes)
         cast_key = hash_bytes[:16]
         return cast_key
 
     def encrypt_private_key(self, passphrase, private_key):
-        # Generate CAST-128 key from passphrase
         cast_key = self.__get_cast_key_from_passphrase(passphrase)
 
-        # Serialize the private key
         private_pem = private_key.private_bytes(
             encoding=serialization.Encoding.PEM,
             format=serialization.PrivateFormat.PKCS8,
@@ -85,22 +79,17 @@ class PrivateKeyPair:
         cipher = CAST.new(cast_key, CAST.MODE_CFB, iv)
         ciphertext = cipher.encrypt(private_pem)
 
-        # Concatenate the nonce, tag, and ciphertext for storage
         encrypted_private_key = base64.urlsafe_b64encode(iv + ciphertext).decode('utf-8')
         return encrypted_private_key
 
     def decrypt_private_key(self, passphrase):
-        # Decode the stored encrypted private key
         decoded = base64.urlsafe_b64decode(self.__encrypted_private_key.encode("utf-8"))
 
-        # Extract the IV and ciphertext
         iv = decoded[:CAST.block_size]
         ciphertext = decoded[CAST.block_size:]
 
-        # Generate CAST-128 key from passphrase
         cast_key = self.__get_cast_key_from_passphrase(passphrase)
 
-        # Decrypt the private key using CAST-128
         cipher = CAST.new(cast_key, CAST.MODE_CFB, iv)
         private_pem = cipher.decrypt(ciphertext)
 
@@ -167,15 +156,16 @@ class PrivateKeyRingCollection:
         for pem_block in pem_blocks:
             try:
                 user_id, str_key_pair = pem_block[11:-9].split(b";")
-                self.key_rings_user_id[user_id.decode()] = PrivateKeyPair("","", "",2048, str_key_pair.decode("utf-8"))
+                self.key_rings_user_id[user_id.decode()] = PrivateKeyPair("", "", "", 2048,
+                                                                          str_key_pair.decode("utf-8"))
 
                 key_id = self.__calc_key_id(serialization.load_pem_public_key(
                     str_key_pair.decode("utf-8").split("|")[3].encode(),
                     backend=default_backend()
                 ))
-                self.key_rings_key_id[key_id] = PrivateKeyPair("","", "",2048, str_key_pair.decode("utf-8"))
+                self.key_rings_key_id[key_id] = PrivateKeyPair("", "", "", 2048, str_key_pair.decode("utf-8"))
             except Exception as e:
-                if len(pem_block)>1:
+                if len(pem_block) > 1:
                     print(e)
 
     def get_ring_data(self):
