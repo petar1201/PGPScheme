@@ -35,8 +35,6 @@ class PrivateKeyPair:
             )
             self.__key_id = self.__calc_key_id()
 
-
-
     def __delete__(self, instance):
         return
 
@@ -135,7 +133,6 @@ class PrivateKeyRingCollection:
         if user_id in self.key_rings_user_id:
             del self.key_rings_user_id[user_id]
 
-
     def export_key_ring_to_pem(self, pem_file_path):
         if not self.key_rings_user_id:
             raise ValueError("Key ring is empty, nothing to export.")
@@ -160,7 +157,4 @@ class PrivateKeyRingCollection:
                 self.key_rings_user_id[user_id.decode()] = PrivateKeyPair("","", "",2048, str_key_pair.decode("utf-8"))
             except Exception:
                 print()
-
-
-
 
