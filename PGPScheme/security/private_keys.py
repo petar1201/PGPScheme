@@ -125,9 +125,9 @@ class PrivateKeyRingCollection:
         return key_pair
 
     def delete_key_pair(self, name, email):
-        if self.key_rings_key_id.keys().__contains__(email + "|" + name):
-            del self.key_rings_user_id[email + "|" + name]
+        if self.key_rings_user_id.keys().__contains__(email + "|" + name):
             del self.key_rings_key_id[self.key_rings_user_id[email + "|" + name].get_key_id()]
+            del self.key_rings_user_id[email + "|" + name]
             return
         raise KeyError
 

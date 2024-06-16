@@ -61,17 +61,9 @@ class PublicKeyRingCollection:
 
     def delete_key_pair_by_user_id(self, user_id):
         if user_id in self.key_rings_user_id:
-            del self.key_rings_user_id[user_id]
             del self.key_rings_key_id[self.key_rings_user_id[user_id].get_key_id()]
+            del self.key_rings_user_id[user_id]
 
-    def import_public_key_pairs_from_file(self, filepath):
-        with open(filepath, mode='r', newline='') as file:
-            reader = csv.reader(file)
-            next(reader)
-            for row in reader:
-                if len(row) == 2:
-                    user_id, public_key = row
-                    self.add_key_pair(user_id, public_key)
 
 
     def get_ring_data(self):
@@ -115,7 +107,7 @@ class PublicKeyRingCollection:
                     str_key_pair.decode("utf-8").split("|")[3].encode(),
                     backend=default_backend()
                 )
-                public_key_pair = PublicKeyPair(user_id, pub_key)
+                public_key_pair = PublicKeyPair(user_id.decode(), pub_key)
                 self.key_rings_user_id[user_id.decode()] = public_key_pair
                 self.key_rings_key_id[public_key_pair.get_key_id()] = public_key_pair
             except Exception as e:

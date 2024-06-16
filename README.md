@@ -4,8 +4,12 @@ PGPScheme is a project for a Exam in Security. Project should be demo implementa
 
 # Setup
 
-To install all needed dependencies, run:  
+User any python after 3.9!
+Run these commands to install needed packages
 ```bash
-pip install -r requirements.txt
+pip install pycryptodomex
+```
+```bash
+pip install cryptography
 ```
 
