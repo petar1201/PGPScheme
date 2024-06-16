@@ -7,4 +7,4 @@ public_key_ring_collection = PublicKeyRingCollection()
 
 key_generator = CAST128SessionKeyGenerator()
 
-private_key_ring_collection.import_key_ring_from_pem("PGPScheme/resources/private/private_keys.pem")
+# private_key_ring_collection.import_key_ring_from_pem("PGPScheme/resources/private/private_keys.pem")
