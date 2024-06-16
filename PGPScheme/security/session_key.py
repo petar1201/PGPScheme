@@ -3,11 +3,12 @@ from Cryptodome.Random import get_random_bytes
 
 
 class CAST128SessionKeyGenerator:
-    def __init__(self, initial_key):
-        self.initial_key = initial_key
-        self.session_key = initial_key
+    def __init__(self):
+        self.initial_key = generate_initial_key()
+        self.session_key = self.initial_key
 
-    def generate_session_key(self, message_block):
+    def generate_session_key(self):
+        message_block = get_message_block()
         cipher = CAST.new(self.session_key, CAST.MODE_CFB, iv=get_random_bytes(CAST.block_size))
         encrypted_block = cipher.encrypt(message_block)
         self.session_key = encrypted_block
